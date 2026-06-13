@@ -1,0 +1,48 @@
+{
+  "alert": {
+    "searchName": "checkout-service error rate > 5%",
+    "receivedAt": "2026-06-13T07:09:04.433Z",
+    "raw": {
+      "sid": "scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781334540_557",
+      "search_name": "checkout-service error rate > 5%",
+      "app": "search",
+      "owner": "rushibhosale84@gmail.com",
+      "results_link": "http://LAPTOP-CM1KFM5O:8000/app/search/@go?sid=scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781334540_557",
+      "result": {
+        "err": "17.74"
+      }
+    },
+    "result": {
+      "err": "17.74"
+    }
+  },
+  "blastRadius": [
+    "checkout-service",
+    "payment-api",
+    "order-service"
+  ],
+  "severity": "SEV-2",
+  "hypotheses": [],
+  "verdict": null,
+  "discussion": [
+    {
+      "from": "Triage",
+      "to": "War Room",
+      "content": "Three core services (checkout, payment, order) are experiencing elevated error rates, with checkout-service peaking at 19.59% errors, payment-api at 13.18%, and order-service at 8.77%. All services show high request volumes, indicating a broad impact on production traffic.",
+      "at": "2026-06-13T07:09:24.601Z"
+    },
+    {
+      "from": "Triage",
+      "to": "Investigation",
+      "content": "Correlate these spikes with recent deployments (query index=deploy_events) and check infra metrics for the hosts running these services. Prioritize reviewing the latest checkout-service deployment and any shared dependencies that could cause cascading failures.",
+      "at": "2026-06-13T07:09:24.601Z"
+    }
+  ],
+  "timeline": [
+    "[Triage] Three core services (checkout, payment, order) are experiencing elevated error rates, with checkout-service peaking at 19.59% errors, payment-api at 13.18%, and order-service at 8.77%. All services show high request volumes, indicating a broad impact on production traffic. — severity: SEV-2"
+  ],
+  "postmortem": null,
+  "incidentId": "2026-06-13T07-09-04_checkout_service_error_rate_5_",
+  "incidentDir": "D:\\projects\\claude\\hackathons\\signaldesk-ai\\incidents\\2026-06-13T07-09-04_checkout_service_error_rate_5_",
+  "status": "in_progress"
+}

@@ -107,8 +107,31 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
           <p className="text-xs text-neutral-500 mt-1">{new Date(inc.alert.receivedAt).toLocaleString()}</p>
         </div>
 
-        {/* War Room Live Feed — always shown */}
-        <WarRoomLive incidentId={id} />
+        {/* War Room Live Feed — only while in progress */}
+        {!isComplete
+          ? <WarRoomLive incidentId={id} />
+          : (
+            <div className="border border-neutral-800 rounded-lg bg-neutral-950 overflow-hidden">
+              <div className="px-5 py-3 border-b border-neutral-800 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-neutral-700" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-500">War Room Feed</span>
+                <span className="ml-auto text-xs font-mono text-neutral-600">CLOSED</span>
+              </div>
+              <div className="px-5 py-3 flex items-center gap-2">
+                {["Triage", "Investigation", "Skeptic", "Scribe"].map((agent, i, arr) => (
+                  <div key={agent} className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-mono font-medium text-neutral-500 border border-neutral-800">
+                      <span>✓</span>
+                      <span>{agent}</span>
+                    </div>
+                    {i < arr.length - 1 && <span className="text-xs text-neutral-700">→</span>}
+                  </div>
+                ))}
+                <span className="ml-auto text-xs text-green-400 font-mono">✓ Complete</span>
+              </div>
+            </div>
+          )
+        }
 
         {/* Completed: scribe report + meta */}
         {isComplete && inc.files?.postmortem && (

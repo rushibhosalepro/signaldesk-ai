@@ -1,11 +1,11 @@
 import { createAgent } from "langchain";
-import type { StructuredTool } from "@langchain/core/tools";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { model } from "../lib/model";
 import { makeFileTools, extractLastJson } from "../lib/fileTools";
 import { SPLUNK_SCHEMA } from "../lib/splunkSchema";
 import { wrapTools } from "../lib/eventBus";
+import { getSplunkTools } from "../splunk/mcp";
 import type { WarRoomState } from "../types";
 
 type TriageReport = {
@@ -40,9 +40,9 @@ Steps you MUST take:
 export async function runTriageAgent(
   state: WarRoomState,
   incidentDir: string,
-  splunkTools: StructuredTool[],
   incidentId: string,
 ): Promise<Partial<WarRoomState>> {
+  const splunkTools = await getSplunkTools();
   const fileTools = makeFileTools(incidentDir);
   const tools = wrapTools([...splunkTools, ...fileTools], "triage", incidentId);
 

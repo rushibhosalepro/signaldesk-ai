@@ -17,6 +17,23 @@ app.use(cors());
 app.post("/webhook", async (req, res) => {
   const payload = req.body as Record<string, unknown>;
   console.log("[Webhook] Received Splunk alert:", JSON.stringify(payload).slice(0, 200));
+
+  // Reject if any incident is already in progress — prevents duplicate pipelines
+  // from Splunk's per-minute cron firing while agents are still running.
+  try {
+    const entries = await fs.readdir(INCIDENTS_ROOT).catch(() => [] as string[]);
+    for (const name of entries) {
+      try {
+        const raw = await fs.readFile(path.join(INCIDENTS_ROOT, name, "state.json"), "utf-8");
+        const state = JSON.parse(raw);
+        if (state.status === "in_progress") {
+          console.log(`[Webhook] Dropped — incident ${name} already in progress.`);
+          return res.status(409).json({ status: "busy", message: "A war room is already active." });
+        }
+      } catch {}
+    }
+  } catch {}
+
   res.status(202).json({ status: "accepted", message: "Incident war room started." });
   runOrchestrator(payload).catch((err) => {
     console.error("[Orchestrator] Fatal error:", err);

@@ -1,7 +1,6 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { createIncidentDir } from "../lib/fileTools";
-import { getSplunkTools } from "../splunk/mcp";
 import { newWarRoomState, type AlertContext, type WarRoomState } from "../types";
 import { emitAgentEvent } from "../lib/eventBus";
 import { runTriageAgent } from "./triage";
@@ -25,7 +24,6 @@ export async function runOrchestrator(
   let state = newWarRoomState(alert);
   const incidentDir = await createIncidentDir(alert.searchName);
   const incidentId = path.basename(incidentDir);
-  const splunkTools = await getSplunkTools();
 
   console.log(`[Orchestrator] Incident dir: ${incidentDir}`);
 
@@ -49,14 +47,14 @@ export async function runOrchestrator(
 
   // 1. Triage
   emitAgentEvent({ type: "agent_start", agent: "triage", incidentId, message: "Assessing blast radius and severity…", timestamp: new Date().toISOString() });
-  state = { ...state, ...(await runTriageAgent(state, incidentDir, splunkTools, incidentId)) };
+  state = { ...state, ...(await runTriageAgent(state, incidentDir, incidentId)) };
   await writeState({ status: "in_progress" });
   emitAgentEvent({ type: "agent_done", agent: "triage", incidentId, message: `Severity: ${state.severity} — ${state.blastRadius.join(", ")}`, timestamp: new Date().toISOString() });
   console.log("[Orchestrator] Triage complete, severity:", state.severity);
 
   // 2. Investigation
   emitAgentEvent({ type: "agent_start", agent: "investigation", incidentId, message: "Forming hypotheses and querying Splunk…", timestamp: new Date().toISOString() });
-  state = { ...state, ...(await runInvestigationAgent(state, incidentDir, splunkTools, incidentId)) };
+  state = { ...state, ...(await runInvestigationAgent(state, incidentDir, incidentId)) };
   await writeState({ status: "in_progress" });
   emitAgentEvent({ type: "agent_done", agent: "investigation", incidentId, message: `Verdict: ${state.verdict?.rootCause?.slice(0, 100) ?? "no verdict"}`, timestamp: new Date().toISOString() });
   console.log("[Orchestrator] Investigation complete, verdict:", state.verdict?.rootCause);
@@ -64,15 +62,15 @@ export async function runOrchestrator(
   // 3. Skeptic
   if (state.verdict?.rootCause) {
     emitAgentEvent({ type: "agent_start", agent: "skeptic", incidentId, message: "Peer-reviewing verdict with adversarial queries…", timestamp: new Date().toISOString() });
-    state = { ...state, ...(await runSkepticAgent(state, incidentDir, splunkTools, incidentId)) };
+    state = { ...state, ...(await runSkepticAgent(state, incidentDir, incidentId)) };
     await writeState({ status: "in_progress" });
-    emitAgentEvent({ type: "agent_done", agent: "skeptic", incidentId, message: `Confidence adjusted to ${Math.round((state.verdict?.confidence ?? 0) * 100)}%`, timestamp: new Date().toISOString() });
+    emitAgentEvent({ type: "agent_done", agent: "skeptic", incidentId, message: `Confidence adjusted to ${Math.round(state.verdict?.confidence ?? 0)}%`, timestamp: new Date().toISOString() });
     console.log("[Orchestrator] Skeptic review complete");
   }
 
   // 4. Scribe
   emitAgentEvent({ type: "agent_start", agent: "scribe", incidentId, message: "Writing postmortem report…", timestamp: new Date().toISOString() });
-  state = { ...state, ...(await runScribeAgent(state, incidentDir, splunkTools, incidentId)) };
+  state = { ...state, ...(await runScribeAgent(state, incidentDir, incidentId)) };
   emitAgentEvent({ type: "agent_done", agent: "scribe", incidentId, message: "Postmortem written.", timestamp: new Date().toISOString() });
   console.log("[Orchestrator] Scribe complete.");
 
