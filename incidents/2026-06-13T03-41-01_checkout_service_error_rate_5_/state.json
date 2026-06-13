@@ -1,0 +1,29 @@
+{
+  "alert": {
+    "searchName": "checkout-service error rate > 5%",
+    "receivedAt": "2026-06-13T03:41:01.799Z",
+    "raw": {
+      "sid": "scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781322060_375",
+      "search_name": "checkout-service error rate > 5%",
+      "app": "search",
+      "owner": "rushibhosale84@gmail.com",
+      "results_link": "http://LAPTOP-CM1KFM5O:8000/app/search/@go?sid=scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781322060_375",
+      "result": {
+        "err": "19.115000000000002"
+      }
+    },
+    "result": {
+      "err": "19.115000000000002"
+    }
+  },
+  "blastRadius": [],
+  "severity": "unknown",
+  "hypotheses": [],
+  "verdict": null,
+  "discussion": [],
+  "timeline": [],
+  "postmortem": null,
+  "incidentId": "2026-06-13T03-41-01_checkout_service_error_rate_5_",
+  "incidentDir": "D:\\projects\\claude\\hackathons\\signaldesk-ai\\incidents\\2026-06-13T03-41-01_checkout_service_error_rate_5_",
+  "status": "in_progress"
+}

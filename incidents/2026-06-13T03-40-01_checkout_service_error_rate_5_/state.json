@@ -1,0 +1,48 @@
+{
+  "alert": {
+    "searchName": "checkout-service error rate > 5%",
+    "receivedAt": "2026-06-13T03:40:01.213Z",
+    "raw": {
+      "sid": "scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781322000_374",
+      "search_name": "checkout-service error rate > 5%",
+      "app": "search",
+      "owner": "rushibhosale84@gmail.com",
+      "results_link": "http://LAPTOP-CM1KFM5O:8000/app/search/@go?sid=scheduler_cnVzaGliaG9zYWxlODRAZ21haWwuY29t__search__RMD5889505bb58ab6026_at_1781322000_374",
+      "result": {
+        "err": "19.03666666666667"
+      }
+    },
+    "result": {
+      "err": "19.03666666666667"
+    }
+  },
+  "blastRadius": [
+    "checkout-service",
+    "payment-api",
+    "order-service"
+  ],
+  "severity": "SEV-2",
+  "hypotheses": [],
+  "verdict": null,
+  "discussion": [
+    {
+      "from": "Triage",
+      "to": "War Room",
+      "content": "All three core services (checkout, payment, order) are experiencing error spikes well above the 5% alert threshold, with checkout-service peaking at ~19.6% error rate. The issue spans multiple services, indicating a systemic problem rather than an isolated incident.",
+      "at": "2026-06-13T03:40:25.665Z"
+    },
+    {
+      "from": "Triage",
+      "to": "Investigation",
+      "content": "1. Correlate these error spikes with recent deployments (run the recent deploys query) to see if a new version introduced the regression. 2. Examine infra metrics for the hosts running these services for resource saturation (CPU/memory). 3. Drill into error messages for each service (e.g., `index=app_logs service=\"checkout-service\" error=* | stats count by error`). 4. If a recent deploy is identified, consider a rollback of the offending version while deeper root‑cause analysis proceeds.",
+      "at": "2026-06-13T03:40:25.665Z"
+    }
+  ],
+  "timeline": [
+    "[Triage] All three core services (checkout, payment, order) are experiencing error spikes well above the 5% alert threshold, with checkout-service peaking at ~19.6% error rate. The issue spans multiple services, indicating a systemic problem rather than an isolated incident. — severity: SEV-2"
+  ],
+  "postmortem": null,
+  "incidentId": "2026-06-13T03-40-01_checkout_service_error_rate_5_",
+  "incidentDir": "D:\\projects\\claude\\hackathons\\signaldesk-ai\\incidents\\2026-06-13T03-40-01_checkout_service_error_rate_5_",
+  "status": "in_progress"
+}
