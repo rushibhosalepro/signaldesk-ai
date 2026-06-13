@@ -2,7 +2,7 @@
 
 > **When Splunk fires an alert, four AI agents convene instantly: one triages, one investigates, one challenges, one writes the postmortem. You watch them work in real time.**
 
-**📹 [Watch Demo](#)** | **🏗️ [Architecture Diagram](./architecture.png)**
+**📹 [Watch Demo](https://youtu.be/9HiD_ekv5ag)** | **🎓 [Architecture Explainer](https://youtu.be/thiRAU_i20M)** | **🏗️ [Architecture Diagram](./architecture.png)**
 
 ![SignalDesk AI — Incident List](./images/homepage.PNG)
 
@@ -42,7 +42,8 @@ The entire pipeline streams live to a dark-theme web UI via WebSocket — you wa
 
 ## Demo & Deployment
 
-- **Demo Video**: [Link to demo video](#) *(under 3 minutes)*
+- **Demo Video**: [SignalDesk AI — Live Incident War Room Demo | Splunk Agentic Ops Hackathon](https://youtu.be/9HiD_ekv5ag)
+- **Explanation**: [How SignalDesk AI Works — 4 Agent Pipeline + Splunk MCP | Architecture Deep Dive](https://youtu.be/thiRAU_i20M)
 - **Live Instance**: Run locally — see setup below
 
 ---
@@ -205,7 +206,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ```bash
 # Clone the repo
-git clone https://github.com/rushibhosalepro/signaldesk-ai
+git clone https://github.com/rushibhosalepro/signaldesk-ai.git
 cd signaldesk-ai
 
 # Install backend dependencies
