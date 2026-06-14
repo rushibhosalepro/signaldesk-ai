@@ -1,7 +1,7 @@
 import { createAgent } from "langchain";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { model } from "../lib/model";
+import { model, withRetry } from "../lib/model";
 import { makeFileTools, extractLastJson } from "../lib/fileTools";
 import { SPLUNK_SCHEMA } from "../lib/splunkSchema";
 import { wrapTools } from "../lib/eventBus";
@@ -49,14 +49,18 @@ export async function runTriageAgent(
   const agent = createAgent({ model, systemPrompt: SYSTEM, tools });
 
   const alertJson = JSON.stringify(state.alert, null, 2);
-  const result = await agent.invoke({
-    messages: [
-      {
-        role: "user",
-        content: `Alert payload:\n\`\`\`json\n${alertJson}\n\`\`\`\n\nUse Splunk MCP tools to gather error rates and service data, then return the JSON result.`,
-      },
-    ],
-  });
+  const result = await withRetry(
+    () =>
+      agent.invoke({
+        messages: [
+          {
+            role: "user",
+            content: `Alert payload:\n\`\`\`json\n${alertJson}\n\`\`\`\n\nUse Splunk MCP tools to gather error rates and service data, then return the JSON result.`,
+          },
+        ],
+      }),
+    "triage.invoke",
+  );
 
   // collect all agent messages for the raw findings file
   const agentLog = result.messages

@@ -61,20 +61,6 @@ Next.js 15 with a `WarRoomLive` client component that connects to WebSocket and 
 
 ---
 
-## Challenges
-
-**The MCP tool sharing bug.** The biggest technical problem was discovering that `MultiServerMCPClient.getTools()` returns cached tool instances. When `wrapTools()` monkey-patches `_call` on those objects, each subsequent agent wraps the previous agent's patch — creating a chain. Every Investigation query emitted both `[INVEST]` and `[TRIAGE]` events. The fix was to create a fresh `MultiServerMCPClient` inside each agent rather than sharing one at the orchestrator level.
-
-**Splunk MCP time filter constraint.** The `splunk_run_query` tool silently returns empty results when SPL queries include `earliest=` or `latest=` time modifiers. This took significant debugging — queries looked correct but returned nothing. The fix was adding an explicit instruction to every agent's system prompt: do not use time modifiers. The seed data is always available without filters.
-
-**Getting agents to produce structured output reliably.** LLMs don't always return valid JSON at the end of a long reasoning trace. Each agent uses `extractLastJson()` — a function that scans backwards through the response to find the last valid JSON block — with a fallback path that still writes a markdown file even when the structured output fails.
-
-**State.json visibility during pipeline.** Initially, `state.json` was only written at the end of the pipeline. The UI had no way to show an incident while agents were running. The fix was writing `state.json` immediately after the incident directory was created (with `status: "in_progress"`), then updating it after each agent completed.
-
-**WebSocket staying open on resolved incidents.** The `WarRoomLive` component was always rendered, even on resolved incidents — keeping a WebSocket connection open indefinitely and showing "LIVE" on closed incidents. The fix was conditionally rendering it only when `!isComplete`, and showing a static "closed" pipeline tracker for resolved incidents.
-
----
-
 ## What I Learned
 
 - **MCP tool instances are stateful objects** — sharing them across agents that wrap `_call` creates hidden chains. Each agent needs its own fresh instances.
@@ -91,4 +77,4 @@ Next.js 15 with a `WarRoomLive` client component that connects to WebSocket and 
 - **Runbook matching** — embed past postmortems and match new incidents against them; if the same root cause was seen before, surface the previous remediation steps
 - **Auto-rollback trigger** — if the Skeptic confirms a deploy-caused incident with >90% confidence, automatically trigger a rollback via the deployment API
 - **Multi-tenant support** — route incoming webhooks to isolated war rooms per team, with separate Splunk indexes and notification channels
-- **Splunk hosted model support** — replace OpenRouter with Splunk's native hosted models for fully on-premise deployments with no external API dependency
+- **Splunk hosted model support** — the LLM is isolated behind a single model factory (`backend/src/lib/model.ts`), so swapping OpenRouter for Splunk's native hosted models is a one-file change. This is designed-for but not yet wired up — hosted-model access was not provisioned during the hackathon window despite repeated requests. Once access is granted, this enables fully on-premise deployments with no external API dependency

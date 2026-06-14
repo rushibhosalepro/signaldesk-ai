@@ -1,7 +1,7 @@
 import { createAgent } from "langchain";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { model } from "../lib/model";
+import { model, withRetry } from "../lib/model";
 import { makeFileTools, extractLastJson } from "../lib/fileTools";
 import { SPLUNK_SCHEMA } from "../lib/splunkSchema";
 import { wrapTools } from "../lib/eventBus";
@@ -51,14 +51,18 @@ export async function runInvestigationAgent(
     2,
   );
 
-  const result = await agent.invoke({
-    messages: [
-      {
-        role: "user",
-        content: `War room state:\n\`\`\`json\n${context}\n\`\`\`\n\nRead triage.md, query Splunk for each hypothesis, then return the JSON result.`,
-      },
-    ],
-  });
+  const result = await withRetry(
+    () =>
+      agent.invoke({
+        messages: [
+          {
+            role: "user",
+            content: `War room state:\n\`\`\`json\n${context}\n\`\`\`\n\nRead triage.md, query Splunk for each hypothesis, then return the JSON result.`,
+          },
+        ],
+      }),
+    "investigation.invoke",
+  );
 
   // collect all agent messages for the raw findings file
   const agentLog = result.messages

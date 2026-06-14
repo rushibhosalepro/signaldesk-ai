@@ -2,7 +2,7 @@
 
 > **When Splunk fires an alert, four AI agents convene instantly: one triages, one investigates, one challenges, one writes the postmortem. You watch them work in real time.**
 
-**📹 [Watch Demo](https://youtu.be/9HiD_ekv5ag)** | **🎓 [Architecture Explainer](https://youtu.be/thiRAU_i20M)** | **🏗️ [Architecture Diagram](./architecture.png)**
+**📹 [Watch Demo](https://youtu.be/9HiD_ekv5ag)** | **🎓 [Architecture Explainer](https://youtu.be/thiRAU_i20M)** | **🏗️ [Architecture Diagram](./architecture_diagram.png)**
 
 ![SignalDesk AI — Incident List](./images/homepage.PNG)
 
@@ -36,7 +36,7 @@ The entire pipeline streams live to a dark-theme web UI via WebSocket — you wa
 ![Live Agent War Room Feed](./images/demo1.PNG)
 ![Postmortem Report](./images/report-preview.PNG)
 
-![Architecture Diagram](./architecture.png)
+![Architecture Diagram](./architecture_diagram.png)
 
 ---
 
@@ -151,7 +151,7 @@ signaldesk-ai/
 │       ├── investigation.md
 │       ├── skeptic.md
 │       └── postmortem.md
-├── architecture.png               # Architecture diagram
+├── architecture_diagram.png       # Architecture diagram
 └── LICENSE                        # MIT
 ```
 

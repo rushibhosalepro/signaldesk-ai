@@ -1,7 +1,7 @@
 import { createAgent } from "langchain";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { model } from "../lib/model";
+import { model, withRetry } from "../lib/model";
 import { makeFileTools, extractLastJson } from "../lib/fileTools";
 import { SPLUNK_SCHEMA } from "../lib/splunkSchema";
 import { wrapTools } from "../lib/eventBus";
@@ -51,14 +51,18 @@ export async function runScribeAgent(
     2,
   );
 
-  const result = await agent.invoke({
-    messages: [
-      {
-        role: "user",
-        content: `Final war room state:\n\`\`\`json\n${context}\n\`\`\`\n\nRead all findings files, then return the JSON with the full postmortem text.`,
-      },
-    ],
-  });
+  const result = await withRetry(
+    () =>
+      agent.invoke({
+        messages: [
+          {
+            role: "user",
+            content: `Final war room state:\n\`\`\`json\n${context}\n\`\`\`\n\nRead all findings files, then return the JSON with the full postmortem text.`,
+          },
+        ],
+      }),
+    "scribe.invoke",
+  );
 
   const lastMsg = result.messages[result.messages.length - 1]?.content ?? "";
   const text = typeof lastMsg === "string" ? lastMsg : JSON.stringify(lastMsg);
